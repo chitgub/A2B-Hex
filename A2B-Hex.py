@@ -1,6 +1,12 @@
 from tkinter import *
 from math import *
 import pygame
+import os
+
+
+chance_sound = os.path.join(os.getcwd(),"chance.mp3")
+win_sound = os.path.join(os.getcwd(),"win.mp3")
+draw_sound = os.path.join(os.getcwd(),"draw.mp3")
 
 master = Tk()
 
@@ -14,7 +20,7 @@ w.pack()
 w.configure(background="dark orange")
 
 pygame.mixer.init()
-pygame.mixer.music.load("/Users/chandon/Desktop/sound6.mp3")
+pygame.mixer.music.load(chance_sound)
 
 hex_side = 50
 
@@ -167,10 +173,14 @@ def is_adjacent_true(hex_num, coordinates, pl):
             if pl == 1:
                 w.delete(chance_text)
                 w.create_text(700, 25, fill="black", font="times 20 bold", text="PLAYER 1 WINS")
+                pygame.mixer.music.load(win_sound)
+                pygame.mixer.music.play()
                 w.unbind("<Button-1>", click)
             if pl == 2:
                 w.delete(chance_text)
                 w.create_text(700, 25, fill="white", font="times 20 bold", text="PLAYER 2 WINS")
+                pygame.mixer.music.load(win_sound)
+                pygame.mixer.music.play()
                 w.unbind("<Button-1>", click)
         if hex_num % 14 == 0:
             if (hex_num + 5) < 105:
@@ -277,9 +287,123 @@ w.create_text(1330,400,fill="gray40",font="times 100 bold",text="B")
 
 chance_text = w.create_text(700,25,fill="black",font="times 20 bold",text="PLAYER 1's CHANCE")
 
+block1_txt = w.create_text(350, 25, fill="black", font="times 20 bold", text="")
+block2_txt = w.create_text(1050, 25, fill="white", font="times 20 bold", text="")
+
+pl_block_1 = 0
+pl_block_2 = 0
+
+
+def go_adjacent(pl, coordinates, num):
+
+    global pl_block_1
+    global pl_block_2
+
+    if coordinates[num - 1].v == 0:
+
+        coordinates[num - 1].v = 1
+
+        if (num % 7 == 0) and (coordinates[num - 1].pn == pl):
+            if pl == 1:
+                pl_block_1 = 1
+            else:
+                pl_block_2 = 1
+
+        if num in range(2, 7):
+            if coordinates[num + 6].pn == pl:
+                go_adjacent(pl, coordinates, num + 7)
+            if coordinates[num + 7].pn == pl:
+                go_adjacent(pl, coordinates, num + 8)
+            if coordinates[num].pn == pl:
+                go_adjacent(pl, coordinates, num + 1)
+            if coordinates[num - 2].pn == pl:
+                go_adjacent(pl, coordinates, num - 1)
+        else:
+            if num in range(100, 105):
+                if coordinates[num - 8].pn == pl:
+                    go_adjacent(pl, coordinates, num - 7)
+                if coordinates[num - 7].pn == pl:
+                    go_adjacent(pl, coordinates, num - 6)
+                if coordinates[num].pn == pl:
+                    go_adjacent(pl, coordinates, num + 1)
+                if coordinates[num - 2].pn == pl:
+                    go_adjacent(pl, coordinates, num - 1)
+            else:
+                if (num % 14) in range(9, 14):
+                    if coordinates[num + 5].pn == pl:
+                        go_adjacent(pl, coordinates, num + 6)
+                    if coordinates[num - 9].pn == pl:
+                        go_adjacent(pl, coordinates, num - 8)
+                    if coordinates[num - 8].pn == pl:
+                        go_adjacent(pl, coordinates, num - 7)
+                    if coordinates[num + 6].pn == pl:
+                        go_adjacent(pl, coordinates, num + 7)
+                    if coordinates[num].pn == pl:
+                        go_adjacent(pl, coordinates, num + 1)
+                    if coordinates[num - 2].pn == pl:
+                        go_adjacent(pl, coordinates, num - 1)
+                else:
+                    if (num % 14) in range(2, 7):
+                        if coordinates[num + 6].pn == pl:
+                            go_adjacent(pl, coordinates, num + 7)
+                        if coordinates[num - 8].pn == pl:
+                            go_adjacent(pl, coordinates, num - 7)
+                        if coordinates[num - 7].pn == pl:
+                            go_adjacent(pl, coordinates, num - 6)
+                        if coordinates[num + 7].pn == pl:
+                            go_adjacent(pl, coordinates, num + 8)
+                        if coordinates[num].pn == pl:
+                            go_adjacent(pl, coordinates, num + 1)
+                        if coordinates[num - 2].pn == pl:
+                            go_adjacent(pl, coordinates, num - 1)
+
+
+def did_player_block(coordinates, pl):
+
+    i = 1
+    while i < 100:
+        if i == 1:
+            if coordinates[i - 1].pn == pl:
+                coordinates[i - 1].v = 1
+                if coordinates[i + 7].pn == pl:
+                    go_adjacent(pl, coordinates, i + 8)
+                if coordinates[i].pn == pl:
+                    go_adjacent(pl, coordinates, i + 1)
+        else:
+            if i == 99:
+                if coordinates[i - 1].pn == pl:
+                    coordinates[i - 1].v = 1
+                    if coordinates[i - 7].pn == pl:
+                        go_adjacent(pl, coordinates, i - 6)
+                    if coordinates[i].pn == pl:
+                        go_adjacent(pl, coordinates, i + 1)
+            else:
+                if (i % 14) % 2 == 0:
+                    if coordinates[i - 1].pn == pl:
+                        coordinates[i - 1].v = 1
+                        if coordinates[i - 8].pn == pl:
+                            go_adjacent(pl, coordinates, i - 7)
+                        if coordinates[i + 6].pn == pl:
+                            go_adjacent(pl, coordinates, i + 7)
+                        if coordinates[i].pn == pl:
+                            go_adjacent(pl, coordinates, i + 1)
+                else:
+                    if (i % 14) % 2 == 1:
+                        if coordinates[i - 1].pn == pl:
+                            coordinates[i - 1].v = 1
+                            if coordinates[i - 7].pn == pl:
+                                go_adjacent(pl, coordinates, i - 6)
+                            if coordinates[i + 7].pn == pl:
+                                go_adjacent(pl, coordinates, i + 8)
+                            if coordinates[i].pn == pl:
+                                go_adjacent(pl, coordinates, i + 1)
+        i = i + 7
+
 
 def click(event):
     global chance
+    global pl_block_1
+    global pl_block_2
     smallest = 10000
     for obj in coords:
         distance = sqrt(((event.y - obj.j) ** 2) + ((event.x - obj.i) ** 2))
@@ -292,7 +416,7 @@ def click(event):
 
     if coords[closest-1].c == 0:
 
-        global chance_text
+        global chance_text, block1_txt, block2_txt
         coords[closest-1].c = 1
         chance = chance + 1
 
@@ -309,10 +433,47 @@ def click(event):
             w.delete(chance_text)
             chance_text = w.create_text(700, 25, fill="black", font="times 20 bold", text="PLAYER 1's CHANCE")
 
-
         is_player_winner(coords, 1)
+
+        for obj in coords:
+            obj.v = 0
+
         is_player_winner(coords, 2)
 
+        for obj in coords:
+            obj.v = 0
+
+        did_player_block(coords, 1)
+
+        for obj in coords:
+            obj.v = 0
+
+        did_player_block(coords, 2)
+
+        for obj in coords:
+            obj.v = 0
+
+        if pl_block_1 == 1:
+            w.delete(block2_txt)
+            block2_txt = w.create_text(1050, 25, fill="white", font="times 20 bold", text="PLAYER 2 BLOCKED")
+
+        if pl_block_2 == 1:
+            w.delete(block1_txt)
+            block1_txt = w.create_text(350, 25, fill="black", font="times 20 bold", text="PLAYER 1 BLOCKED")
+
+        if pl_block_1 == 1 and pl_block_2 == 1:
+            w.delete(chance_text)
+            w.create_text(700, 25, fill="gray40", font="times 20 bold", text="GAME DRAW")
+            pygame.mixer.music.load(draw_sound)
+            pygame.mixer.music.play()
+            w.unbind("<Button-1>", click)
+
+        if chance == 105:
+            w.delete(chance_text)
+            w.create_text(700, 25, fill="gray40", font="times 20 bold", text="GAME DRAW")
+            pygame.mixer.music.load(draw_sound)
+            pygame.mixer.music.play()
+            w.unbind("<Button-1>", click)
 
     for obj in coords:
         obj.v = 0
