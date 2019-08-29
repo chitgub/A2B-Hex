@@ -1,5 +1,6 @@
 from tkinter import *
 from math import *
+import pygame
 
 master = Tk()
 
@@ -11,6 +12,9 @@ w = Canvas(master, width=canvas_width, height=canvas_height)
 w.pack()
 
 w.configure(background="dark orange")
+
+pygame.mixer.init()
+pygame.mixer.music.load("/Users/chandon/Desktop/sound6.mp3")
 
 hex_side = 50
 
@@ -273,6 +277,7 @@ w.create_text(1330,400,fill="gray40",font="times 100 bold",text="B")
 
 chance_text = w.create_text(700,25,fill="black",font="times 20 bold",text="PLAYER 1's CHANCE")
 
+
 def click(event):
     global chance
     smallest = 10000
@@ -294,16 +299,20 @@ def click(event):
         if (chance % 2) == 1:
             coords[closest - 1].pn = 1
             w.create_oval(closest_i - 25, closest_j - 25, closest_i + 25, closest_j + 25, fill="black")
+            pygame.mixer.music.play()
             w.delete(chance_text)
             chance_text = w.create_text(700, 25, fill="white", font="times 20 bold", text="PLAYER 2's CHANCE")
         else:
             coords[closest - 1].pn = 2
             w.create_oval(closest_i - 25, closest_j - 25, closest_i + 25, closest_j + 25, outline="white", fill="white")
+            pygame.mixer.music.play()
             w.delete(chance_text)
             chance_text = w.create_text(700, 25, fill="black", font="times 20 bold", text="PLAYER 1's CHANCE")
 
+
         is_player_winner(coords, 1)
         is_player_winner(coords, 2)
+
 
     for obj in coords:
         obj.v = 0
