@@ -48,6 +48,7 @@ coords = []
 
 
 def append_in_coords(cnqrd, vstd, pno, sno, a, b):
+
     coord_obj = Coord()
     
     coord_obj.c = cnqrd
@@ -166,22 +167,18 @@ for count in range(0, 7):
 
 
 def is_adjacent_true(hex_num, coordinates, pl):
-    global chance_text
+
+    global chance_text, pl_win_1, pl_win_2
+
     if coordinates[hex_num - 1].pn == pl:
         coordinates[hex_num - 1].v = 1
+
         if hex_num > 98:
             if pl == 1:
-                w.delete(chance_text)
-                w.create_text(700, 25, fill="black", font="times 20 bold", text="PLAYER 1 WINS")
-                pygame.mixer.music.load(win_sound)
-                pygame.mixer.music.play()
-                w.unbind("<Button-1>", click)
+                pl_win_1 = 1
             if pl == 2:
-                w.delete(chance_text)
-                w.create_text(700, 25, fill="white", font="times 20 bold", text="PLAYER 2 WINS")
-                pygame.mixer.music.load(win_sound)
-                pygame.mixer.music.play()
-                w.unbind("<Button-1>", click)
+                pl_win_2 = 1
+
         if hex_num % 14 == 0:
             if (hex_num + 5) < 105:
                 if coordinates[hex_num + 5].v != 1:
@@ -250,9 +247,12 @@ def is_adjacent_true(hex_num, coordinates, pl):
 
 
 def is_player_winner(coordinates, pl):
+
     for first_row in range(0, 7):
+
         if coordinates[first_row].pn == pl:
             coordinates[first_row].v = 1
+
             if coordinates[first_row].sn == 1:
                 if coordinates[coordinates[first_row].sn + 6].v != 1:
                     is_adjacent_true(coordinates[first_row].sn + 7, coordinates, pl)
@@ -260,12 +260,14 @@ def is_player_winner(coordinates, pl):
                     is_adjacent_true(coordinates[first_row].sn + 8, coordinates, pl)
                 if coordinates[coordinates[first_row].sn].v != 1:
                     is_adjacent_true(coordinates[first_row].sn + 1, coordinates, pl)
+
             else:
                 if coordinates[first_row].sn == 7:
                     if coordinates[coordinates[first_row].sn + 6].v != 1:
                         is_adjacent_true(coordinates[first_row].sn + 7, coordinates, pl)
                     if coordinates[coordinates[first_row].sn - 2].v != 1:
                         is_adjacent_true(coordinates[first_row].sn - 1, coordinates, pl)
+
                 else:
                     if coordinates[coordinates[first_row].sn + 6].v != 1:
                         is_adjacent_true(coordinates[first_row].sn + 7, coordinates, pl)
@@ -282,8 +284,8 @@ chance = 0
 w.create_text(500,735,fill="black",font="times 20 bold",text="PLAYER 1 : BLACK")
 w.create_text(900,735,fill="white",font="times 20 bold",text="PLAYER 2 : WHITE")
 
-w.create_text(65,400,fill="gray40",font="times 100 bold",text="A")
-w.create_text(1330,400,fill="gray40",font="times 100 bold",text="B")
+w.create_text(65,375,fill="gray40",font="times 100 bold",text="A")
+w.create_text(1330,375,fill="gray40",font="times 100 bold",text="B")
 
 chance_text = w.create_text(700,25,fill="black",font="times 20 bold",text="PLAYER 1's CHANCE")
 
@@ -293,6 +295,9 @@ block2_txt = w.create_text(1050, 25, fill="white", font="times 20 bold", text=""
 pl_block_1 = 0
 pl_block_2 = 0
 
+pl_win_1 = 0
+pl_win_2 = 0
+
 
 def go_adjacent(pl, coordinates, num):
 
@@ -300,7 +305,6 @@ def go_adjacent(pl, coordinates, num):
     global pl_block_2
 
     if coordinates[num - 1].v == 0:
-
         coordinates[num - 1].v = 1
 
         if (num % 7 == 0) and (coordinates[num - 1].pn == pl):
@@ -361,6 +365,7 @@ def go_adjacent(pl, coordinates, num):
 def did_player_block(coordinates, pl):
 
     i = 1
+
     while i < 100:
         if i == 1:
             if coordinates[i - 1].pn == pl:
@@ -400,10 +405,14 @@ def did_player_block(coordinates, pl):
         i = i + 7
 
 
+def set_visited_0(coordinates):
+
+    for obj in coordinates:
+        obj.v = 0
+
+
 def click(event):
-    global chance
-    global pl_block_1
-    global pl_block_2
+    global chance, pl_block_1, pl_block_2, pl_win_1, pl_win_2
     smallest = 10000
     for obj in coords:
         distance = sqrt(((event.y - obj.j) ** 2) + ((event.x - obj.i) ** 2))
@@ -417,6 +426,7 @@ def click(event):
     if coords[closest-1].c == 0:
 
         global chance_text, block1_txt, block2_txt
+
         coords[closest-1].c = 1
         chance = chance + 1
 
@@ -434,24 +444,30 @@ def click(event):
             chance_text = w.create_text(700, 25, fill="black", font="times 20 bold", text="PLAYER 1's CHANCE")
 
         is_player_winner(coords, 1)
-
-        for obj in coords:
-            obj.v = 0
+        set_visited_0(coords)
 
         is_player_winner(coords, 2)
+        set_visited_0(coords)
 
-        for obj in coords:
-            obj.v = 0
+        if pl_win_1 == 1:
+            w.delete(chance_text)
+            w.create_text(700, 25, fill="black", font="times 20 bold", text="PLAYER 1 WINS")
+            pygame.mixer.music.load(win_sound)
+            pygame.mixer.music.play()
+            w.unbind("<Button-1>", click)
+
+        if pl_win_2 == 1:
+            w.delete(chance_text)
+            w.create_text(700, 25, fill="white", font="times 20 bold", text="PLAYER 2 WINS")
+            pygame.mixer.music.load(win_sound)
+            pygame.mixer.music.play()
+            w.unbind("<Button-1>", click)
 
         did_player_block(coords, 1)
-
-        for obj in coords:
-            obj.v = 0
+        set_visited_0(coords)
 
         did_player_block(coords, 2)
-
-        for obj in coords:
-            obj.v = 0
+        set_visited_0(coords)
 
         if pl_block_1 == 1:
             w.delete(block2_txt)
@@ -474,9 +490,6 @@ def click(event):
             pygame.mixer.music.load(draw_sound)
             pygame.mixer.music.play()
             w.unbind("<Button-1>", click)
-
-    for obj in coords:
-        obj.v = 0
 
 
 w.bind("<Button-1>", click)
