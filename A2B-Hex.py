@@ -4,9 +4,9 @@ import pygame
 import os
 
 
-chance_sound = os.path.join(os.getcwd(),"chance.mp3")
-win_sound = os.path.join(os.getcwd(),"win.mp3")
-draw_sound = os.path.join(os.getcwd(),"draw.mp3")
+chance_sound = os.path.join(os.getcwd(), "chance.mp3")
+win_sound = os.path.join(os.getcwd(), "win.mp3")
+draw_sound = os.path.join(os.getcwd(), "draw.mp3")
 
 master = Tk()
 
@@ -14,15 +14,34 @@ canvas_width = 1400
 canvas_height = 900
 
 w = Canvas(master, width=canvas_width, height=canvas_height)
-
 w.pack()
-
 w.configure(background="dark orange")
 
 pygame.mixer.init()
 pygame.mixer.music.load(chance_sound)
 
 hex_side = 50
+x = 170
+y = 140
+pl_block_1 = 0
+pl_block_2 = 0
+pl_win_1 = 0
+pl_win_2 = 0
+chance = 0
+coords = []
+
+w.create_text(500,735,fill="black",font="times 20 bold",text="PLAYER 1 : BLACK")
+w.create_text(900,735,fill="white",font="times 20 bold",text="PLAYER 2 : WHITE")
+w.create_text(65,375,fill="gray40",font="times 100 bold",text="A")
+w.create_text(1330,375,fill="gray40",font="times 100 bold",text="B")
+
+chance_text = w.create_text(700,25,fill="black",font="times 20 bold",text="PLAYER 1's CHANCE")
+block1_txt = w.create_text(350, 25, fill="black", font="times 20 bold", text="")
+block2_txt = w.create_text(1050, 25, fill="white", font="times 20 bold", text="")
+
+
+class Coord:
+    pass
 
 
 def create_hex(a, b):
@@ -36,134 +55,126 @@ def create_hex(a, b):
     w.create_line(a - hex_side, b, a - (hex_side * cos(1.0472)), b - (hex_side * sin(1.0472)), fill="black")
 
 
-x = 170
-y = 140
-
-
-class Coord:
-    pass
-
-
-coords = []
-
-
 def append_in_coords(cnqrd, vstd, pno, sno, a, b):
 
     coord_obj = Coord()
-    
     coord_obj.c = cnqrd
     coord_obj.v = vstd
     coord_obj.pn = pno
     coord_obj.sn = sno
     coord_obj.i = a
     coord_obj.j = b
-
     coords.append(coord_obj)
 
 
-for count in range(0, 7):
-    create_hex(x, y + ((2 * count) * hex_side * sin(1.0472)))
+def create_board(x, y, hex_side):
 
-for count in range(0, 7):
-    create_hex(x + hex_side + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x, y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (3 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + hex_side + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (4 * hex_side) + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (3 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (6 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (4 * hex_side) + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (7 * hex_side) + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (6 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (9 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (7 * hex_side) + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (10 * hex_side) + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (9 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (12 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (10 * hex_side) + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (13 * hex_side) + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (12 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (15 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (13 * hex_side) + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (16 * hex_side) + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (15 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (18 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (16 * hex_side) + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (19 * hex_side) + (hex_side * cos(1.0472)),
-               y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (18 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    create_hex(x + (21 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (19 * hex_side) + (hex_side * cos(1.0472)),
+                   y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 1, x, y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        create_hex(x + (21 * hex_side), y + ((2 * count) * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 8, x + hex_side + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 15, x + (3 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+def init_append(x, y, hex_side):
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 22, x + (4 * hex_side) + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 1, x, y + (2 * count * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 29, x + (6 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 8, x + hex_side + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 36, x + (7 * hex_side) + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 15, x + (3 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 43, x + (9 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 22, x + (4 * hex_side) + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 50, x + (10 * hex_side) + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 29, x + (6 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 57, x + (12 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 36, x + (7 * hex_side) + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 64, x + (13 * hex_side) + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 43, x + (9 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 71, x + (15 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 50, x + (10 * hex_side) + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 78, x + (16 * hex_side) + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 57, x + (12 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 85, x + (18 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 64, x + (13 * hex_side) + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 92, x + (19 * hex_side) + (hex_side * cos(1.0472)),
-                     y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 71, x + (15 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
 
-for count in range(0, 7):
-    append_in_coords(0, 0, 0, count + 99, x + (21 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 78, x + (16 * hex_side) + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 85, x + (18 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
+
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 92, x + (19 * hex_side) + (hex_side * cos(1.0472)),
+                         y - (hex_side * sin(1.0472)) + (count * 2 * hex_side * sin(1.0472)))
+
+    for count in range(0, 7):
+        append_in_coords(0, 0, 0, count + 99, x + (21 * hex_side), y + (2 * count * hex_side * sin(1.0472)))
 
 
 def is_adjacent_true(hex_num, coordinates, pl):
@@ -279,30 +290,9 @@ def is_player_winner(coordinates, pl):
                         is_adjacent_true(coordinates[first_row].sn + 1, coordinates, pl)
 
 
-chance = 0
-
-w.create_text(500,735,fill="black",font="times 20 bold",text="PLAYER 1 : BLACK")
-w.create_text(900,735,fill="white",font="times 20 bold",text="PLAYER 2 : WHITE")
-
-w.create_text(65,375,fill="gray40",font="times 100 bold",text="A")
-w.create_text(1330,375,fill="gray40",font="times 100 bold",text="B")
-
-chance_text = w.create_text(700,25,fill="black",font="times 20 bold",text="PLAYER 1's CHANCE")
-
-block1_txt = w.create_text(350, 25, fill="black", font="times 20 bold", text="")
-block2_txt = w.create_text(1050, 25, fill="white", font="times 20 bold", text="")
-
-pl_block_1 = 0
-pl_block_2 = 0
-
-pl_win_1 = 0
-pl_win_2 = 0
-
-
 def go_adjacent(pl, coordinates, num):
 
-    global pl_block_1
-    global pl_block_2
+    global pl_block_1, pl_block_2
 
     if coordinates[num - 1].v == 0:
         coordinates[num - 1].v = 1
@@ -412,8 +402,11 @@ def set_visited_0(coordinates):
 
 
 def click(event):
+
     global chance, pl_block_1, pl_block_2, pl_win_1, pl_win_2
+
     smallest = 10000
+
     for obj in coords:
         distance = sqrt(((event.y - obj.j) ** 2) + ((event.x - obj.i) ** 2))
         if distance < smallest:
@@ -491,6 +484,9 @@ def click(event):
             pygame.mixer.music.play()
             w.unbind("<Button-1>", click)
 
+
+create_board(x, y, hex_side)
+init_append(x, y, hex_side)
 
 w.bind("<Button-1>", click)
 
